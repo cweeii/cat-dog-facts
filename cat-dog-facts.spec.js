@@ -1,5 +1,6 @@
 const { spy, stub } = require('sinon')
-const { getFacts } = require('./cat-dog-facts')
+const { getFacts, chooseRandomFact } = require('./cat-dog-facts')
+const { concat } = require('ramda')
 
 const catFactsUrl = 'https://catfact.ninja/facts?limit=300'
 const dogFactsUrl = 'https://dog-api.kinduff.com/api/facts?number=100'
@@ -47,6 +48,20 @@ test('should catch errors if either dog facts or cat facts were unretrievable', 
     done()
   }
   return getFacts({}, fetch, cb)
+})
+
+test('should return a random fact from an array', () => {
+  const Math = {
+    floor: stub().returns(0),
+    random: stub().returns(0)
+  }
+  const facts = ['fact1', 'fact2']
+
+  const actual = chooseRandomFact(Math, facts)
+
+  expect(Math.floor.callCount).toEqual(1)
+  expect(Math.random.callCount).toEqual(1)
+  expect(actual).toEqual('fact1')
 })
 
 function getDogFact() {
