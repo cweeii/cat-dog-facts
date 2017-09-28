@@ -9,7 +9,7 @@ const chooseRandomFact = (Math, allTheFacts) => {
   return allTheFacts[randomFactIndex]
 }
 
-const getFacts = (Math, fetch, cb) => {
+const getFacts = (Math, fetch, ctx, cb) => {
   const catPromise = fetch(catFactsUrl)
   const dogPromise = fetch(dogFactsUrl)
 
@@ -30,8 +30,8 @@ const getFacts = (Math, fetch, cb) => {
     })
 }
 
-module.exports = cb => {
-  getFacts(Math, fetch, cb)
+module.exports = (ctx, cb) => {
+  getFacts(Math, fetch, ctx, cb)
 }
 
 module.exports.chooseRandomFact = chooseRandomFact

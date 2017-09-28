@@ -1,6 +1,6 @@
 const { spy, stub } = require('sinon')
 const { getFacts, chooseRandomFact } = require('./cat-dog-facts')
-const { concat } = require('ramda')
+const { pluck, concat } = require('ramda')
 
 const catFactsUrl = 'https://catfact.ninja/facts?limit=300'
 const dogFactsUrl = 'https://dog-api.kinduff.com/api/facts?number=100'
@@ -35,6 +35,31 @@ test('should fetch cat facts and dog facts', done => {
   }
 
   return getFacts(Math, fetch, cb)
+})
+
+test.only('should return a fact from cache if exists in cache', done => {
+  const catFact = pluck('fact')(getCatFact().data)
+  const dogFacts = getDogFact().facts
+  const facts = concat(catFact, dogFacts)
+  const Math = {
+    floor: stub().returns(0),
+    random: stub().returns(0)
+  }
+  const expected = getCatFact().data[0].fact
+
+  const ctx = {
+    storage: {
+      get: f => f(null, facts)
+    }
+  }
+
+  const cb = (err, res) => {
+    expect(Math.random.callCount).toEqual(1)
+    expect(Math.floor.callCount).toEqual(1)
+    expect(res).toEqual(expected)
+    done()
+  }
+  return getFacts(Math, fetch, ctx, cb)
 })
 
 test('should catch errors if either dog facts or cat facts were unretrievable', done => {
