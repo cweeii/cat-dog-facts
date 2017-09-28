@@ -1,0 +1,20 @@
+{
+  "name": "cat-dog-facts",
+  "version": "1.0.0",
+  "description": "",
+  "main": "cat-dog-facts.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "fetch-everywhere": "^1.0.5",
+    "ramda": "^0.24.1"
+  },
+  "devDependencies": {
+    "jest-cli": "^20.0.4",
+    "sinon": "^4.0.0"
+  }
+}
