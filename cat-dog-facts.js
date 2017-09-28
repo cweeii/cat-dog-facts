@@ -11,7 +11,7 @@ const chooseRandomFact = (Math, allTheFacts) => {
 
 const getFacts = (Math, fetch, ctx, cb) => {
   ctx.storage.get((err, data) => {
-    if (data) return cb(null, chooseRandomFact(Math, data))
+    if (data) return cb(null, chooseRandomFact(Math, data.facts))
 
     const catPromise = fetch(catFactsUrl)
     const dogPromise = fetch(dogFactsUrl)
@@ -25,7 +25,7 @@ const getFacts = (Math, fetch, ctx, cb) => {
         const dogFacts = dogResult.facts
 
         const allTheFacts = concat(catFacts, dogFacts)
-        ctx.storage.set(allTheFacts, { force: 1 })
+        ctx.storage.set({ facts: allTheFacts }, { force: 1 })
         const randomFact = chooseRandomFact(Math, allTheFacts)
         cb(null, randomFact)
       })

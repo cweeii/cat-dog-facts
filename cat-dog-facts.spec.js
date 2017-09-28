@@ -37,7 +37,7 @@ test('should fetch cat facts and dog facts and set to cache', done => {
     expect(fetch.args[1][0]).toEqual(dogFactsUrl)
     expect(Math.random.callCount).toEqual(1)
     expect(Math.floor.callCount).toEqual(1)
-    expect(ctx.storage.set.args[0][0]).toEqual(facts)
+    expect(ctx.storage.set.args[0][0]).toEqual(factsFromCache)
     expect(ctx.storage.set.args[0][1]).toEqual({ force: 1 })
     expect(res).toEqual(expected)
     done()
