@@ -10,24 +10,28 @@ const chooseRandomFact = (Math, allTheFacts) => {
 }
 
 const getFacts = (Math, fetch, ctx, cb) => {
-  const catPromise = fetch(catFactsUrl)
-  const dogPromise = fetch(dogFactsUrl)
+  ctx.storage.get((err, data) => {
+    if (data) return cb(null, chooseRandomFact(Math, data))
 
-  return Promise.all([catPromise, dogPromise])
-    .then(([catResponse, dogResponse]) => {
-      return Promise.all([catResponse.json(), dogResponse.json()])
-    })
-    .then(([catResult, dogResult]) => {
-      const catFacts = pluck('fact')(catResult.data)
-      const dogFacts = dogResult.facts
+    const catPromise = fetch(catFactsUrl)
+    const dogPromise = fetch(dogFactsUrl)
 
-      const allTheFacts = concat(catFacts, dogFacts)
-      const randomFact = chooseRandomFact(Math, allTheFacts)
-      cb(null, randomFact)
-    })
-    .catch(e => {
-      cb(e)
-    })
+    return Promise.all([catPromise, dogPromise])
+      .then(([catResponse, dogResponse]) => {
+        return Promise.all([catResponse.json(), dogResponse.json()])
+      })
+      .then(([catResult, dogResult]) => {
+        const catFacts = pluck('fact')(catResult.data)
+        const dogFacts = dogResult.facts
+
+        const allTheFacts = concat(catFacts, dogFacts)
+        const randomFact = chooseRandomFact(Math, allTheFacts)
+        cb(null, randomFact)
+      })
+      .catch(e => {
+        cb(e)
+      })
+  })
 }
 
 module.exports = (ctx, cb) => {

@@ -4,23 +4,29 @@ const { pluck, concat } = require('ramda')
 
 const catFactsUrl = 'https://catfact.ninja/facts?limit=300'
 const dogFactsUrl = 'https://dog-api.kinduff.com/api/facts?number=100'
+const catFacts = pluck('fact')(getCatFact().data)
+const dogFacts = getDogFact().facts
+const facts = concat(catFacts, dogFacts)
 
-test('should fetch cat facts and dog facts', done => {
-  const catFact = {
+test('should fetch cat facts and dog facts and set to cache', done => {
+  const catResponse = {
     json: () => Promise.resolve(getCatFact())
   }
-  const dogFact = {
+  const dogResponse = {
     json: () => Promise.resolve(getDogFact())
   }
   const fetch = stub()
-  fetch.onCall(0).returns(Promise.resolve(catFact))
-  fetch.onCall(1).returns(Promise.resolve(dogFact))
-
+  fetch.onCall(0).returns(Promise.resolve(catResponse))
+  fetch.onCall(1).returns(Promise.resolve(dogResponse))
   const Math = {
     floor: stub().returns(0),
     random: stub().returns(0)
   }
-
+  const ctx = {
+    storage: {
+      get: f => f(null, null)
+    }
+  }
   const expected = getCatFact().data[0].fact
 
   const cb = (err, res) => {
@@ -34,24 +40,23 @@ test('should fetch cat facts and dog facts', done => {
     done()
   }
 
-  return getFacts(Math, fetch, cb)
+  return getFacts(Math, fetch, ctx, cb)
 })
 
-test.only('should return a fact from cache if exists in cache', done => {
-  const catFact = pluck('fact')(getCatFact().data)
+test('should return a fact from cache if exists in cache', done => {
+  const catFacts = pluck('fact')(getCatFact().data)
   const dogFacts = getDogFact().facts
-  const facts = concat(catFact, dogFacts)
+  const facts = concat(catFacts, dogFacts)
   const Math = {
     floor: stub().returns(0),
     random: stub().returns(0)
   }
-  const expected = getCatFact().data[0].fact
-
   const ctx = {
     storage: {
       get: f => f(null, facts)
     }
   }
+  const expected = getCatFact().data[0].fact
 
   const cb = (err, res) => {
     expect(Math.random.callCount).toEqual(1)
@@ -64,7 +69,11 @@ test.only('should return a fact from cache if exists in cache', done => {
 
 test('should catch errors if either dog facts or cat facts were unretrievable', done => {
   const fetch = stub().returns(Promise.reject('error'))
-
+  const ctx = {
+    storage: {
+      get: f => f(null, null)
+    }
+  }
   const cb = (err, res) => {
     expect(err).toEqual('error')
     expect(fetch.callCount).toEqual(2)
@@ -72,7 +81,8 @@ test('should catch errors if either dog facts or cat facts were unretrievable', 
     expect(fetch.args[1][0]).toEqual(dogFactsUrl)
     done()
   }
-  return getFacts({}, fetch, cb)
+
+  return getFacts({}, fetch, ctx, cb)
 })
 
 test('should return a random fact from an array', () => {
