@@ -4,6 +4,11 @@ const { pluck, concat } = require('ramda')
 const catFactsUrl = 'https://catfact.ninja/facts?limit=300'
 const dogFactsUrl = 'https://dog-api.kinduff.com/api/facts?number=100'
 
+const chooseRandomFact = (Math, allTheFacts) => {
+  const randomFactIndex = Math.floor(Math.random() * allTheFacts.length)
+  return allTheFacts[randomFactIndex]
+}
+
 const getFacts = (Math, fetch, cb) => {
   const catPromise = fetch(catFactsUrl)
   const dogPromise = fetch(dogFactsUrl)
@@ -17,8 +22,8 @@ const getFacts = (Math, fetch, cb) => {
       const dogFacts = dogResult.facts
 
       const allTheFacts = concat(catFacts, dogFacts)
-      const randomFactIndex = Math.floor(Math.random() * allTheFacts.length)
-      cb(null, allTheFacts[randomFactIndex])
+      const randomFact = chooseRandomFact(Math, allTheFacts)
+      cb(null, randomFact)
     })
     .catch(e => {
       cb(e)
@@ -29,4 +34,5 @@ module.exports = cb => {
   getFacts(Math, fetch, cb)
 }
 
+module.exports.chooseRandomFact = chooseRandomFact
 module.exports.getFacts = getFacts
