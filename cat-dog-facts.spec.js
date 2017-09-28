@@ -8,7 +8,7 @@ const catFacts = pluck('fact')(getCatFact().data)
 const dogFacts = getDogFact().facts
 const facts = concat(catFacts, dogFacts)
 
-test.only('should fetch cat facts and dog facts and set to cache', done => {
+test('should fetch cat facts and dog facts and set to cache', done => {
   const catResponse = {
     json: () => Promise.resolve(getCatFact())
   }

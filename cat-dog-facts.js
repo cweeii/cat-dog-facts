@@ -26,6 +26,7 @@ const getFacts = (Math, fetch, ctx, cb) => {
         const dogFacts = dogResult.facts
 
         const allTheFacts = concat(catFacts, dogFacts)
+        ctx.storage.set(allTheFacts, { force: 1 })
         const randomFact = chooseRandomFact(Math, allTheFacts)
         cb(null, randomFact)
       })
