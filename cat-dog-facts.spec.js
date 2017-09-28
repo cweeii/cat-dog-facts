@@ -8,7 +8,7 @@ const catFacts = pluck('fact')(getCatFact().data)
 const dogFacts = getDogFact().facts
 const facts = concat(catFacts, dogFacts)
 
-test('should fetch cat facts and dog facts and set to cache', done => {
+test.only('should fetch cat facts and dog facts and set to cache', done => {
   const catResponse = {
     json: () => Promise.resolve(getCatFact())
   }
@@ -24,7 +24,8 @@ test('should fetch cat facts and dog facts and set to cache', done => {
   }
   const ctx = {
     storage: {
-      get: f => f(null, null)
+      get: f => f(null, null),
+      set: spy()
     }
   }
   const expected = getCatFact().data[0].fact
@@ -36,6 +37,8 @@ test('should fetch cat facts and dog facts and set to cache', done => {
     expect(fetch.args[1][0]).toEqual(dogFactsUrl)
     expect(Math.random.callCount).toEqual(1)
     expect(Math.floor.callCount).toEqual(1)
+    expect(ctx.storage.set.args[0][0]).toEqual(facts)
+    expect(ctx.storage.set.args[0][1]).toEqual({ force: 1 })
     expect(res).toEqual(expected)
     done()
   }
@@ -79,6 +82,21 @@ test('should catch errors if either dog facts or cat facts were unretrievable', 
     expect(fetch.callCount).toEqual(2)
     expect(fetch.args[0][0]).toEqual(catFactsUrl)
     expect(fetch.args[1][0]).toEqual(dogFactsUrl)
+    done()
+  }
+
+  return getFacts({}, fetch, ctx, cb)
+})
+
+test('should callback with error if getting from cache fails', done => {
+  const fetch = () => {}
+  const ctx = {
+    storage: {
+      get: f => f('error', null)
+    }
+  }
+  const cb = (err, res) => {
+    expect(err).toEqual('error')
     done()
   }
 

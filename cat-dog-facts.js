@@ -11,6 +11,7 @@ const chooseRandomFact = (Math, allTheFacts) => {
 
 const getFacts = (Math, fetch, ctx, cb) => {
   ctx.storage.get((err, data) => {
+    if (err) return cb(err)
     if (data) return cb(null, chooseRandomFact(Math, data))
 
     const catPromise = fetch(catFactsUrl)
