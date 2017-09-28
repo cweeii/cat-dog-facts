@@ -88,21 +88,6 @@ test('should catch errors if either dog facts or cat facts were unretrievable', 
   return getFacts({}, fetch, ctx, cb)
 })
 
-test('should callback with error if getting from cache fails', done => {
-  const fetch = () => {}
-  const ctx = {
-    storage: {
-      get: f => f('error', null)
-    }
-  }
-  const cb = (err, res) => {
-    expect(err).toEqual('error')
-    done()
-  }
-
-  return getFacts({}, fetch, ctx, cb)
-})
-
 test('should return a random fact from an array', () => {
   const Math = {
     floor: stub().returns(0),
