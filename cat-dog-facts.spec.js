@@ -6,7 +6,7 @@ const catFactsUrl = 'https://catfact.ninja/facts?limit=300'
 const dogFactsUrl = 'https://dog-api.kinduff.com/api/facts?number=100'
 const catFacts = pluck('fact')(getCatFact().data)
 const dogFacts = getDogFact().facts
-const facts = concat(catFacts, dogFacts)
+const factsFromCache = { facts: concat(catFacts, dogFacts) }
 
 test('should fetch cat facts and dog facts and set to cache', done => {
   const catResponse = {
@@ -56,7 +56,7 @@ test('should return a fact from cache if exists in cache', done => {
   }
   const ctx = {
     storage: {
-      get: f => f(null, facts)
+      get: f => f(null, factsFromCache)
     }
   }
   const expected = getCatFact().data[0].fact
